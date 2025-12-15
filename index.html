@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusBoost - Магазин игровых услуг</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-900: #0a0a0a;
+            --gray-800: #1a1a1a;
+            --gray-700: #2a2a2a;
+            --gray-600: #4a4a4a;
+            --gray-300: #cccccc;
+            --glass-white: rgba(255, 255, 255, 0.08);
+            --glass-black: rgba(0, 0, 0, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --neon-blue: #00f3ff;
+            --neon-purple: #9d00ff;
+        }
+        
+        body {
+            font-family: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--black) 100%);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+        
+        /* Стеклянный морфизм */
+        .glass {
+            background: var(--glass-white);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 15px rgba(0, 243, 255, 0.1);
+        }
+        
+        /* Навбар геймерский */
+        .navbar {
+            padding: 1.2rem 0;
+            background: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.8rem 0;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .nav-link {
+            color: var(--white) !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Герой секция */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(157, 0, 255, 0.03) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        /* Неоновые акценты */
+        .neon-text {
+            text-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 30px var(--neon-blue);
+        }
+        
+        .neon-border {
+            box-shadow: 
+                inset 0 0 15px rgba(0, 243, 255, 0.2),
+                0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        
+        /* Игровые услуги */
+        .game-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 243, 255, 0.1);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover .game-icon {
+            background: rgba(0, 243, 255, 0.2);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        /* Цены */
+        .price-tag {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+        
+        /* Кнопки */
+        .btn-glow {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(0, 243, 255, 0.4),
+                0 0 30px rgba(157, 0, 255, 0.3);
+            color: var(--white);
+        }
+        
+        .btn-outline-glow {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .btn-outline-glow:hover {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--white);
+        }
+        
+        /* Статистика */
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Форма заказа */
+        .order-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+        }
+        
+        .order-form .form-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 10px;
+        }
+        
+        .order-form .form-control:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            color: var(--white);
+        }
+        
+        /* Игры */
+        .game-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: grayscale(1) brightness(2);
+            transition: all 0.3s ease;
+        }
+        
+        .game-logo:hover {
+            filter: grayscale(0) brightness(1);
+            transform: scale(1.1);
+        }
+        
+        /* Анимации */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Футер */
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid rgba(0, 243, 255, 0.1);
+            padding: 60px 0 30px;
+            margin-top: 100px;
+        }
+        
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--neon-blue), var(--neon-purple));
+            border-radius: 5px;
+        }
+        
+        /* Бейджи */
+        .badge-popular {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: var(--black);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="#">
+                <i class="bi bi-controller me-2 neon-text"></i>NEXUS<span class="neon-text">BOOST</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Услуги</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#games">Игры</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#stats">Статистика</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#order">Заказать</a></li>
+                </ul>
+                <a href="#order" class="btn btn-glow ms-lg-3">Буст сейчас</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Герой секция -->
+    <section id="home" class="hero">
+        <div class="hero-bg"></div>
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-6 animate-on-scroll">
+                    <h1 class="display-2 fw-bold mb-4">
+                        ПРОФЕССИОНАЛЬНЫЙ<br>
+                        <span class="neon-text">БУСТИНГ</span><br>
+                        ИГРОВЫХ АККАУНТОВ
+                    </h1>
+                    <p class="lead mb-4 opacity-75">Мы помогаем игрокам достигать максимальных результатов в любимых играх. Безопасно, быстро, анонимно.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#services" class="btn btn-glow btn-lg">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Выбрать услугу
+                        </a>
+                        <a href="#order" class="btn btn-outline-glow btn-lg">
+                            <i class="bi bi-whatsapp me-2"></i>Консультация
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 animate-on-scroll">
+                    <div class="glass-card rounded-4 p-4 neon-border">
+                        <div class="position-relative">
+                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                                 alt="Игровой бустинг" class="img-fluid rounded-3">
+                        </div>
+                        <div class="mt-4">
+                            <h4 class="mb-2">Топ 1% бустеров</h4>
+                            <p class="opacity-75 mb-0">Более 5000 довольных клиентов по всему СНГ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Услуги -->
+    <section id="services" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5 animate-on-scroll">
+                <span class="badge glass px-4 py-2 mb-3">УСЛУГИ</span>
+                <h2 class="display-3 fw-bold mb-3">Популярные <span class="neon-text">бусты</span></h2>
+                <p class="lead opacity-75">Выберите нужную услугу для вашей игры</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Услуга 1 -->
+                <div class="col-md-4 animate-on-scroll">
+                    <div class="glass-card rounded-4 p-4 h-100 game-card position-relative">
+                        <span class="badge-popular">ХИТ</span>
+                        <div class="game-icon">
+                            <i class="bi bi-trophy fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3 text-center">Повышение ранга</h3>
+                        <p class="text-center opacity-75 mb-4">Профессиональный буст вашего аккаунта до нужного ранга</p>
+                        <div class="text-center">
+                            <div class="price-tag">от 999₽</div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Гарантия результата</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Онлайн-трекинг</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Страховка аккаунта</li>
+                            </ul>
+                            <a href="#order" class="btn btn-glow w-100">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Услуга 2 -->
+                <div class="col-md-4 animate-on-scroll">
+                    <div class="glass-card rounded-4 p-4 h-100 game-card">
+                        <div class="game-icon">
+                            <i class="bi bi-speedometer2 fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3 text-center">Калибровка</h3>
+                        <p class="text-center opacity-75 mb-4">Прохождение калибровочных матчей для высокого стартового ММР</p>
+                        <div class="text-center">
+                            <div class="price-tag">от 1499₽</div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>10 калибровочных игр</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Высокий winrate</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Скрытый пул</li>
+                            </ul>
+                            <a href="#order" class="btn btn-glow w-100">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Услуга 3 -->
+                <div class="col-md-4 animate-on-scroll">
+                    <div class="glass-card rounded-4 p-4 h-100 game-card">
+                        <div class="game-icon">
+                            <i class="bi bi-coin fs-3"></i>
+                        </div>
+                        <h3 class="h4 mb-3 text-center">Фарм ресурсов</h3>
+                        <p class="text-center opacity-75 mb-4">Набор игровой валюты, предметов и ресурсов</p>
+                        <div class="text-center">
+                            <div class="price-tag">от 499₽</div>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Любое количество</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Быстрый фарм</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Без использования ботов</li>
+                            </ul>
+                            <a href="#order" class="btn btn-glow w-100">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Игры -->
+    <section id="games" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5 animate-on-scroll">
+                <span class="badge glass px-4 py-2 mb-3">ИГРЫ</span>
+                <h2 class="display-3 fw-bold mb-3">Поддерживаемые <span class="neon-text">игры</span></h2>
+                <p class="lead opacity-75">Работаем с самыми популярными играми</p>
+            </div>
+            
+            <div class="row justify-content-center g-4">
+                <div class="col-md-2 col-4 text-center animate-on-scroll">
+                    <div class="glass-card rounded-3 p-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Dota_2_Logo.png" 
+                             alt="Dota 2" class="game-logo">
+                        <p class="mt-2 mb-0">Dota 2</p>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4 text-center animate-on-scroll">
+                    <div class="glass-card rounded-3 p-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/League_of_Legends_logo.png" 
+                             alt="League of Legends" class="game-logo">
+                        <p class="mt-2 mb-0">League of Legends</p>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4 text-center animate-on-scroll">
+                    <div class="glass-card rounded-3 p-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Valorant_logo.svg/1200px-Valorant_logo.svg.png" 
+                             alt="Valorant" class="game-logo" style="filter: brightness(3);">
+                        <p class="mt-2 mb-0">Valorant</p>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4 text-center animate-on-scroll">
+                    <div class="glass-card rounded-3 p-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Counter-Strike_2_Logo.svg/1200px-Counter-Strike_2_Logo.svg.png" 
+                             alt="CS2" class="game-logo">
+                        <p class="mt-2 mb-0">Counter-Strike 2</p>
+                    </div>
+                </div>
+                <div class="col-md-2 col-4 text-center animate-on-scroll">
+                    <div class="glass-card rounded-3 p-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Overwatch_2_logo.svg/1200px-Overwatch_2_logo.svg.png" 
+                             alt="Overwatch 2" class="game-logo">
+                        <p class="mt-2 mb-0">Overwatch 2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Статистика -->
+    <section id="stats" class="py-5">
+        <div class="container">
+            <div class="glass-card rounded-4 p-5">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-4 mb-md-0 animate-on-scroll">
+                        <div class="stats-number">5000+</div>
+                        <p class="opacity-75">Выполненных заказов</p>
+                    </div>
+                    <div class="col-md-3 mb-4 mb-md-0 animate-on-scroll">
+                        <div class="stats-number">99%</div>
+                        <p class="opacity-75">Положительных отзывов</p>
+                    </div>
+                    <div class="col-md-3 mb-4 mb-md-0 animate-on-scroll">
+                        <div class="stats-number">24/7</div>
+                        <p class="opacity-75">Поддержка клиентов</p>
+                    </div>
+                    <div class="col-md-3 animate-on-scroll">
+                        <div class="stats-number">50+</div>
+                        <p class="opacity-75">Профессиональных бустеров</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Форма заказа -->
+    <section id="order" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 animate-on-scroll">
+                    <h2 class="display-3 fw-bold mb-4">Быстрый <span class="neon-text">заказ</span></h2>
+                    <p class="lead opacity-75 mb-4">Заполните форму и наш менеджер свяжется с вами в течение 15 минут</p>
+                    
+                    <div class="glass-card rounded-4 p-4 mb-4">
+                        <h4 class="mb-3"><i class="bi bi-shield-check text-success me-2"></i>Гарантии безопасности</h4>
+                        <ul class="opacity-75">
+                            <li class="mb-2">Анонимность - никто не узнает о бусте</li>
+                            <li class="mb-2">Страховка аккаунта на сумму заказа</li>
+                            <li class="mb-2">Используем только ручной бустинг</li>
+                            <li>Работаем через безопасные VPN</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="glass-card rounded-4 p-4">
+                        <h4 class="mb-3"><i class="bi bi-clock-history text-info me-2"></i>Сроки выполнения</h4>
+                        <ul class="opacity-75">
+                            <li class="mb-2">Повышение ранга: 1-7 дней</li>
+                            <li class="mb-2">Калибровка: 1-3 дня</li>
+                            <li>Фарм ресурсов: от 1 дня</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 animate-on-scroll">
+                    <div class="order-form">
+                        <h3 class="mb-4">Форма заказа</h3>
+                        <form id="boostOrderForm">
+                            <div class="mb-3">
+                                <label class="form-label">Выберите игру</label>
+                                <select class="form-select">
+                                    <option selected>Dota 2</option>
+                                    <option>League of Legends</option>
+                                    <option>Valorant</option>
+                                    <option>CS2</option>
+                                    <option>Overwatch 2</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Тип услуги</label>
+                                <select class="form-select">
+                                    <option selected>Повышение ранга</option>
+                                    <option>Калибровка</option>
+                                    <option>Фарм ресурсов</option>
+                                    <option>Обучение</option>
+                                    <option>Другое</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Текущий ранг</label>
+                                    <input type="text" class="form-control" placeholder="Например: Legend 3">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Желаемый ранг</label>
+                                    <input type="text" class="form-control" placeholder="Например: Ancient 5">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Ваш никнейм</label>
+                                <input type="text" class="form-control" placeholder="Steam/RIOT ID">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Контакт для связи</label>
+                                <input type="text" class="form-control" placeholder="Telegram/Discord">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Дополнительные пожелания</label>
+                                <textarea class="form-control" rows="3" placeholder="Особые требования..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-glow w-100">
+                                <i class="bi bi-send me-2"></i>Отправить заявку
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5 animate-on-scroll">
+                <span class="badge glass px-4 py-2 mb-3">FAQ</span>
+                <h2 class="display-4 fw-bold mb-3">Частые <span class="neon-text">вопросы</span></h2>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion glass" id="faqAccordion">
+                        <div class="accordion-item glass border-0 mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button glass collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Безопасно ли бустить аккаунт?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body opacity-75">
+                                    Да, мы используем только ручной бустинг, безопасные VPN и работаем по строгому регламенту. Все бустеры проходят проверку, а аккаунты застрахованы.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item glass border-0 mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button glass collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Сколько времени занимает буст?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body opacity-75">
+                                    Зависит от услуги: калибровка - 1-3 дня, повышение ранга - 1-7 дней, фарм ресурсов - от 1 дня. Точные сроки обсуждаются индивидуально.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item glass border-0">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button glass collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Можно ли следить за прогрессом?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body opacity-75">
+                                    Да, мы предоставляем доступ к трекеру, где вы можете видеть прогресс выполнения заказа в реальном времени.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-5">
+                    <h3 class="mb-4"><i class="bi bi-controller me-2"></i>NEXUS<span class="neon-text">BOOST</span></h3>
+                    <p class="opacity-75">Профессиональный бустинг игровых аккаунтов. Безопасно, быстро, анонимно.</p>
+                    <div class="social-links mt-4">
+                        <a href="#" class="btn btn-glass me-2">
+                            <i class="bi bi-telegram"></i>
+                        </a>
+                        <a href="#" class="btn btn-glass me-2">
+                            <i class="bi bi-discord"></i>
+                        </a>
+                        <a href="#" class="btn btn-glass">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-5">
+                    <h5 class="mb-4">Услуги</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3"><a href="#services" class="opacity-75 text-decoration-none">Повышение ранга</a></li>
+                        <li class="mb-3"><a href="#services" class="opacity-75 text-decoration-none">Калибровка</a></li>
+                        <li class="mb-3"><a href="#services" class="opacity-75 text-decoration-none">Фарм ресурсов</a></li>
+                        <li><a href="#services" class="opacity-75 text-decoration-none">Обучение</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-5">
+                    <h5 class="mb-4">Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3"><i class="bi bi-telegram me-2"></i><span class="opacity-75">@nexusboost_support</span></li>
+                        <li class="mb-3"><i class="bi bi-discord me-2"></i><span class="opacity-75">nexusboost</span></li>
+                        <li><i class="bi bi-envelope me-2"></i><span class="opacity-75">support@nexusboost.ru</span></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-4">Оплата</h5>
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="badge glass px-3 py-2">QIWI</span>
+                        <span class="badge glass px-3 py-2">Card</span>
+                        <span class="badge glass px-3 py-2">Crypto</span>
+                    </div>
+                    <p class="small opacity-50">Принимаем все популярные способы оплаты</p>
+                </div>
+            </div>
+            <hr class="my-4 opacity-25">
+            <div class="text-center">
+                <p class="opacity-50">© 2025 NEXUSBOOST. Все права защищены. Мы не связаны с Valve, Riot Games или другими компаниями.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Анимация при скролле
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+                
+                if (elementPosition < screenPosition) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Навбар при скролле
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            animateOnScroll();
+        });
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            animateOnScroll();
+            
+            // Форма заказа
+            const orderForm = document.getElementById('boostOrderForm');
+            if (orderForm) {
+                orderForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Заявка отправлена! Менеджер свяжется с вами в течение 15 минут.');
+                    orderForm.reset();
+                });
+            }
+        });
+
+        // Плавная прокрутка
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Эффект неонового текста
+        const neonTexts = document.querySelectorAll('.neon-text');
+        setInterval(() => {
+            neonTexts.forEach(text => {
+                text.style.textShadow = `
+                    0 0 10px var(--neon-blue),
+                    0 0 20px var(--neon-blue),
+                    0 0 30px var(--neon-blue),
+                    0 0 40px var(--neon-purple)
+                `;
+            });
+            
+            setTimeout(() => {
+                neonTexts.forEach(text => {
+                    text.style.textShadow = `
+                        0 0 10px var(--neon-blue),
+                        0 0 20px var(--neon-blue),
+                        0 0 30px var(--neon-blue)
+                    `;
+                });
+            }, 500);
+        }, 2000);
+        // Инициализация EmailJS
+        (function() {
+            emailjs.init("uUuiak0bvMkkVzf8o"); // Ваш Public Key
+        })();
+
+        // Обработка формы
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Отправка...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Собираем данные формы
+                const formData = {
+                    game: form.querySelector('[name="game"]').value,
+                    service: form.querySelector('[name="service"]').value,
+                    current_rank: form.querySelector('[name="current_rank"]').value,
+                    desired_rank: form.querySelector('[name="desired_rank"]').value,
+                    username: form.querySelector('[name="username"]').value,
+                    contact: form.querySelector('[name="contact"]').value,
+                    email: form.querySelector('[name="email"]').value,
+                    message: form.querySelector('[name="message"]').value,
+                    date: new Date().toLocaleString('ru-RU')
+                };
+                
+                // Отправка через EmailJS
+                const response = await emailjs.send(
+                    "service_ed8493b",     // Service ID
+                    "template_stoglnl",    // Template ID
+                    formData
+                );
+                
+                if (response.status === 200) {
+                    // Успешная отправка
+                    formAlert.className = 'alert alert-success';
+                    formAlert.innerHTML = `
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Успех!</strong> Заявка отправлена. Мы свяжемся с вами в течение 15 минут.
+                    `;
+                    formAlert.classList.remove('d-none');
+                    
+                    // Сброс формы
+                    form.reset();
+                    
+                    // Прокрутка к уведомлению
+                    formAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    throw new Error('Ошибка отправки');
+                }
+            } catch (error) {
+                // Ошибка отправки
+                formAlert.className = 'alert alert-error';
+                formAlert.innerHTML = `
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Ошибка!</strong> ${error.text || 'Не удалось отправить заявку. Пожалуйста, напишите нам в Telegram.'}
+                `;
+                formAlert.classList.remove('d-none');
+                console.error('EmailJS error:', error);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
